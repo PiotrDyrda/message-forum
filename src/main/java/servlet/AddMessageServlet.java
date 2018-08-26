@@ -31,7 +31,7 @@ public class AddMessageServlet extends HttpServlet {
 
         RequestDispatcher requestDispatcher = req.getRequestDispatcher("/index.jsp");
 
-        if (content != null && content.equals("")) {
+        if (content != null && content.length() > 0) {
             messageServices.addMessage(content);
         }
 

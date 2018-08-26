@@ -1,25 +1,49 @@
 package model;
 
-import java.util.ArrayList;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.query.Query;
+import util.HibernateUtil;
+
 import java.util.Collections;
 import java.util.List;
 
 class MessageRepository {
 
-    private static List<Message> messages = new ArrayList<>();
+    public List<Message> getAll() {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction tx = null;
 
-//    public MessageRepository(){
-//        messages.add(new Message("sms 1"));
-//        messages.add(new Message("sms 2"));
-//        messages.add(new Message("sms 3"));
-//    }
+        try {
+            tx = session.beginTransaction();
 
-    public List<Message> getAll(){
-        return Collections.unmodifiableList(messages);
+            Query query = session.createQuery("from Message m");
+
+            List<Message> messages = query.getResultList();
+
+            tx.commit();
+            return messages;
+        } catch (Exception e) {
+            tx.rollback();
+            return Collections.emptyList();
+        } finally {
+            session.close();
+        }
     }
 
-    public Message save(Message message){
-        messages.add(message);
-        return message;
+    public Message save(Message message) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            session.save(message);
+            tx.commit();
+            return message;
+        } catch (Exception e) {
+            tx.rollback();
+            return null;
+        } finally {
+            session.close();
+        }
     }
 }
